@@ -1,5 +1,7 @@
 package com.axgrid.rpc;
 
+import com.axgrid.rpc.dto.AxRPCDescription;
+import com.axgrid.rpc.dto.AxRPCDescriptionMethod;
 import com.google.protobuf.GeneratedMessageV3;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +17,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
-public abstract class AxRPCService<T extends GeneratedMessageV3, V extends GeneratedMessageV3, C extends AxRPCContext> {
+public abstract class AxRPCService<T extends GeneratedMessageV3, V extends GeneratedMessageV3, C extends AxRPCContext> implements AxRPCDescription {
 
     private final List<MethodHolder> methods;
 
@@ -39,6 +41,15 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
 
     final Pattern patternHas = Pattern.compile("^hasOp(.*)$");
     final Pattern patternGet = Pattern.compile("^getOp(.*)$");
+
+
+    public List<AxRPCDescriptionMethod> getDescription() {
+        return methods.stream().map(item -> new AxRPCDescriptionMethod(
+                item.getGetMethod().getReturnType().getName(),
+                item.getSetMethod().getParameterTypes()[0].getName(),
+                item.loginRequired
+                )).collect(Collectors.toList());
+    }
 
     public AxRPCService() {
 

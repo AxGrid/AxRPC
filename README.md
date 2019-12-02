@@ -1,0 +1,49 @@
+AxRPC
+=====
+
+Usage
+-----
+
+Create proto:
+
+```proto
+
+message Request {
+    int64 correlationId = 1; // CID Field
+    OpPing op_ping = 10;     // Your Request Message
+}
+
+message Response {
+    int64 correlationId = 1; // CID Field
+    bool success = 2;        // Success RPC Field
+    string errorText = 3;    // Error Text Field
+    int32 errorCode = 4;     // Code Field
+
+    RpPing rp_ping = 10;     // Your Response Message
+}
+
+message OpPing {             // Your Request Message
+    uint64 time = 1;
+}
+
+message RpPing {              // Your Response Message
+    uint64 time = 1;
+}
+
+```
+
+Create Spring Boot Service
+
+```java
+
+@Service
+public class AxTestRPC extends AxRPCService<Request, Response, AxContext> {
+
+    @AxRPC
+    public RpPing.Builder ping(OpPing ping) {
+        return RpPing.newBuilder().setTime(ping.getTime());
+    }
+}
+
+```
+

@@ -8,6 +8,7 @@ option java_multiple_files = true;
 message Request {
     int64 correlationId = 1;
     OpPing op_ping = 10;
+    OpHelloWorld op_hello_world = 11;
 }
 
 

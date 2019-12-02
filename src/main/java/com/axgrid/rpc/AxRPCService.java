@@ -1,7 +1,6 @@
 package com.axgrid.rpc;
 
 import com.google.protobuf.GeneratedMessageV3;
-import com.oracle.tools.packager.Log;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;

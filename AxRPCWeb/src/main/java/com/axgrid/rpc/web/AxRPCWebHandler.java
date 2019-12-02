@@ -4,6 +4,7 @@ package com.axgrid.rpc.web;
 import com.axgrid.rpc.AxRPCContext;
 import com.axgrid.rpc.AxRPCService;
 import com.axgrid.rpc.Request;
+import com.axgrid.rpc.exceptions.AxRPCInitializeException;
 import com.axgrid.rpc.exceptions.AxRPCNotFoundException;
 import com.axgrid.rpc.service.AxRPCContextService;
 import com.axgrid.rpc.service.AxRPCWebService;
@@ -59,7 +60,7 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
         }
     }
 
-    public AxRPCWebHandler() throws NoSuchMethodException {
+    public AxRPCWebHandler()  {
         this.persistentResponseClass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[1];
 
@@ -68,8 +69,12 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
 
         this.persistentContextClass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[2];
-
-        parseFrom = this.persistentRequestClass.getMethod("parseFrom", InputStream.class);
+        try {
+            parseFrom = this.persistentRequestClass.getMethod("parseFrom", InputStream.class);
+        }catch (NoSuchMethodException e) {
+            log.error("Protobuf parseFrom(InputStream) not found");
+            throw new AxRPCInitializeException();
+        }
     }
 
 }

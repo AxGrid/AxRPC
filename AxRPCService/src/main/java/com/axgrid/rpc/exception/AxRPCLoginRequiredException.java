@@ -1,4 +1,4 @@
-package com.axgrid.rpc;
+package com.axgrid.rpc.exception;
 
 public class AxRPCLoginRequiredException extends AxRPCException {
     public AxRPCLoginRequiredException(){

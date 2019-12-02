@@ -1,7 +1,12 @@
-package com.axgrid.rpc;
+package com.axgrid.rpc.services;
 
+import com.axgrid.rpc.AxRPC;
+import com.axgrid.rpc.AxRPCLoginRequired;
+import com.axgrid.rpc.dto.AxRPCContext;
 import com.axgrid.rpc.dto.AxRPCDescription;
 import com.axgrid.rpc.dto.AxRPCDescriptionMethod;
+import com.axgrid.rpc.exception.AxRPCException;
+import com.axgrid.rpc.exception.AxRPCLoginRequiredException;
 import com.google.protobuf.GeneratedMessageV3;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -182,7 +187,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
                 setField(builder, successFieldName, false);
                 log.error("Invoke Error in method {}.{}(): {}", target.getClass().getName(), innerMethod.getName(), ex.getMessage());
                 setField(builder, errorTextFieldName, ex.getMessage() == null ? "NULL" : ex.getMessage());
-                setField(builder, errorCodeFieldName, ex.code);
+                setField(builder, errorCodeFieldName, ex.getCode());
             }catch (InvocationTargetException ex) {
                 setField(builder, successFieldName, false);
                 if (ex.getCause() != null) {

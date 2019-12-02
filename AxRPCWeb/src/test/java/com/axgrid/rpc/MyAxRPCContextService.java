@@ -1,15 +1,14 @@
 package com.axgrid.rpc;
 
 
-import com.axgrid.rpc.web.service.AxRPCContextService;
+import com.axgrid.rpc.services.AxRPCContextServiceImpl;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-
 @Service
-public class MyAxRPCContextService implements AxRPCContextService<Request, MyAxRPCContext> {
+public class MyAxRPCContextService extends AxRPCContextServiceImpl<Request, MyAxRPCContext> {
     @Override
-    public MyAxRPCContext getContext(Request request, HttpServletRequest httpRequest) {
+    public MyAxRPCContext getContext(Request request, Object httpRequest) {
         return new MyAxRPCContext();
     }
+
 }

@@ -1,11 +1,11 @@
 package com.axgrid.rpc.web.handler;
 
 
-import com.axgrid.rpc.AxRPCContext;
-import com.axgrid.rpc.AxRPCService;
-import com.axgrid.rpc.web.exceptions.AxRPCInitializeException;
+import com.axgrid.rpc.dto.AxRPCContext;
+import com.axgrid.rpc.services.AxRPCService;
+import com.axgrid.rpc.exception.AxRPCInitializeException;
 import com.axgrid.rpc.web.exceptions.AxRPCNotFoundException;
-import com.axgrid.rpc.web.service.AxRPCContextService;
+import com.axgrid.rpc.services.AxRPCContextService;
 import com.google.protobuf.GeneratedMessageV3;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,6 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
     @PostMapping("/")
     public void protoRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-
             T requestProto = (T)parseFrom.invoke(null, request.getInputStream());
             C ctx = contextService.getContext(requestProto, request);
             if (log.isDebugEnabled()) log.debug("AxRpcRequest {} CTX:{}", requestProto, ctx);

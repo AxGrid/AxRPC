@@ -1,4 +1,4 @@
-package com.axgrid.rpc;
+package com.axgrid.rpc.exception;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

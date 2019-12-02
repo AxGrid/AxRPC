@@ -1,7 +1,8 @@
-package com.axgrid.rpc.web;
+package com.axgrid.rpc.web.handler;
 
 import com.axgrid.rpc.dto.AxRPCDescription;
-import com.axgrid.rpc.service.AxRPCWebService;
+
+import com.axgrid.rpc.web.service.AxRPCWebService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,4 +1,4 @@
-package com.axgrid.rpc.exceptions;
+package com.axgrid.rpc.web.exceptions;
 
 public class AxRPCInitializeException extends RuntimeException {
 }

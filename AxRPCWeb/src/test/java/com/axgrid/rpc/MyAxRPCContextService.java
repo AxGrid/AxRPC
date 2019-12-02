@@ -1,6 +1,7 @@
 package com.axgrid.rpc;
 
-import com.axgrid.rpc.service.AxRPCContextService;
+
+import com.axgrid.rpc.web.service.AxRPCContextService;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;

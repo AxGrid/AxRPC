@@ -11,6 +11,7 @@
     <modules>
         <module>AxRPCService</module>
         <module>AxRPCWeb</module>
+        <module>AxRPCNet</module>
     </modules>
 
     <parent>

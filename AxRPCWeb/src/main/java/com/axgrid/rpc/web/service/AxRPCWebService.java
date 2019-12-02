@@ -1,4 +1,4 @@
-package com.axgrid.rpc.service;
+package com.axgrid.rpc.web.service;
 
 import com.axgrid.rpc.dto.AxRPCDescription;
 import org.springframework.beans.factory.annotation.Autowired;

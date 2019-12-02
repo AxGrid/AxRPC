@@ -1,4 +1,4 @@
-package com.axgrid.rpc;
+package com.axgrid.rpc.web;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

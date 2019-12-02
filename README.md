@@ -47,3 +47,19 @@ public class AxTestRPC extends AxRPCService<Request, Response, AxContext> {
 
 ```
 
+
+Execute Spring Boot Service
+```java
+
+@Component
+public class TestAxRPC {
+
+    @Autowired
+    AxTestRPC rpc;
+
+    public void execute(Request r) {
+        Response response = rpc.request(r, null);
+    }
+}
+
+```

@@ -41,10 +41,9 @@ Create ContextService
 
 ```java
 
-@Component
-@RequestMapping("/ax-rpc/")
-public class MyAxRPCContextService implements AxRPCContextService<Request, MyContext> { 
-    public MyContext getContext(Request request, HttpServletRequest httpRequest) {
+@Service
+public class MyAxRPCContextService implements AxRPCContextServiceImpl<Request, MyContext> { 
+    public MyContext getContext(Request request, Object httpRequest) {
         return new MyContext(); // Get From Repository
     }       
 }

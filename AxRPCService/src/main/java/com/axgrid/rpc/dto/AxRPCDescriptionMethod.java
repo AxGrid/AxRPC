@@ -6,7 +6,10 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class AxRPCDescriptionMethod {
-    String requestObject;
-    String responseObject;
+    String name;
+    String requestFullName;
+    String requestName;
+    String responseFullName;
+    String responseName;
     boolean loginRequired;
 }

@@ -13,7 +13,7 @@ public class AxRPCWebService {
     List<AxRPCDescription> rpcDescriptions;
 
     public List<AxRPCDescription> getServices() {
-        return null;
+        return rpcDescriptions;
     }
 
 }

@@ -8,7 +8,7 @@ Install
 <dependency>
     <groupId>com.axgrid.rpc</groupId>
     <artifactId>AxRPCService</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 </dependency>
 ```
 

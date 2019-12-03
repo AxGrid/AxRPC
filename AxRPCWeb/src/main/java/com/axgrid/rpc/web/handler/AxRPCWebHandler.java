@@ -1,6 +1,5 @@
 package com.axgrid.rpc.web.handler;
 
-
 import com.axgrid.rpc.dto.AxRPCContext;
 import com.axgrid.rpc.services.AxRPCService;
 import com.axgrid.rpc.exception.AxRPCInitializeException;
@@ -8,7 +7,9 @@ import com.axgrid.rpc.web.exceptions.AxRPCNotFoundException;
 import com.axgrid.rpc.services.AxRPCContextService;
 import com.google.protobuf.GeneratedMessageV3;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
     private Class<T> persistentContextClass;
 
     private Method parseFrom;
+    private Method parseFromBytes;
 
     @Autowired(required = false)
     List<AxRPCService<T, V, C>> services;
@@ -35,10 +37,15 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
     @Autowired
     AxRPCContextService<T, C> contextService;
 
-    @PostMapping("/")
-    public void protoRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @PostMapping(value = "/", produces = { "application/octet-stream" }, consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public void protoRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, InvocationTargetException, IllegalAccessException {
+        log.info("Incoming request");
         try {
-            T requestProto = (T)parseFrom.invoke(null, request.getInputStream());
+
+            byte[] getBytes = IOUtils.toByteArray(request.getInputStream());
+            log.debug("Read {} bytes", getBytes.length);
+            //T requestProto = (T)parseFrom.invoke(null, request.getInputStream());
+            T requestProto = (T)parseFromBytes.invoke(null, getBytes);
             C ctx = contextService.getContext(requestProto, request);
             if (log.isDebugEnabled()) log.debug("AxRpcRequest {} CTX:{}", requestProto, ctx);
             for(AxRPCService<T, V, C> service : services) {
@@ -52,7 +59,9 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
             if (log.isDebugEnabled()) log.debug("AxRpcResponse: Not found");
             throw new AxRPCNotFoundException();
 
-        }catch (InvocationTargetException | IllegalAccessException ignore) {
+        }catch (InvocationTargetException | IllegalAccessException e) {
+            log.error("InvocationError:{}", e.getMessage());
+            throw e;
         }
     }
 
@@ -67,6 +76,7 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
                 .getGenericSuperclass()).getActualTypeArguments()[2];
         try {
             parseFrom = this.persistentRequestClass.getMethod("parseFrom", InputStream.class);
+            parseFromBytes = this.persistentRequestClass.getMethod("parseFrom", byte[].class);
         }catch (NoSuchMethodException e) {
             log.error("Protobuf parseFrom(InputStream) not found");
             throw new AxRPCInitializeException();

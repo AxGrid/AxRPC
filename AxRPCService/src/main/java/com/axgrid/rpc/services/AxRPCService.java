@@ -9,6 +9,7 @@ import com.axgrid.rpc.exception.AxRPCException;
 import com.axgrid.rpc.exception.AxRPCLoginRequiredException;
 import com.google.protobuf.GeneratedMessageV3;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -34,24 +35,96 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
     private Class<T> persistentRequestClass;
     private Class<T> persistentContextClass;
 
-    private String errorCodeFieldName = "errorCode";
-    private String correlationIdFieldName = "correlationId";
-    private String successFieldName = "success";
-    private String errorTextFieldName = "errorText";
+
+    public static String errorCodeFieldName = "errorCode";
+
+    public static String correlationIdFieldName = "correlationId";
+
+    public static String successFieldName = "success";
+
+    public static String errorTextFieldName = "errorText";
+
+    public static String sessionFieldName = "session";
+
+    public String getSessionFieldName() {
+        try {
+            if (persistentRequestClass.getMethod("get" + StringUtils.capitalize(sessionFieldName)) != null) {
+                return sessionFieldName;
+            } else return null;
+        }catch(NoSuchMethodException ignore) {
+            return null;
+        }
+    }
+
+    public String getErrorCodeFieldName() {
+        try {
+            if (persistentResponseClass.getMethod("get" + StringUtils.capitalize(errorCodeFieldName)) != null) {
+                return errorCodeFieldName;
+            } else return null;
+        }catch(NoSuchMethodException ignore) {
+            return null;
+        }
+    }
+
+    public String getSuccessFieldName() {
+        try {
+            if (persistentResponseClass.getMethod("get" + StringUtils.capitalize(successFieldName)) != null) {
+                return successFieldName;
+            } else return null;
+        }catch(NoSuchMethodException ignore) {
+            return null;
+        }
+    }
+
+    public String getErrorTextFieldName() {
+        try {
+            if (persistentResponseClass.getMethod("get" + StringUtils.capitalize(errorTextFieldName)) != null) {
+                return errorTextFieldName;
+            } else return null;
+        }catch(NoSuchMethodException ignore) {
+            return null;
+        }
+    }
+
+    public String getCorrelationIdFieldName() {
+        try {
+            if (persistentRequestClass.getMethod("get" + StringUtils.capitalize(correlationIdFieldName)) != null) {
+                return correlationIdFieldName;
+            } else return null;
+        }catch(NoSuchMethodException ignore) {
+            return null;
+        }
+    }
 
 
     private MethodHolder getRPCMethod(Class<?> type) {
         return methods.stream().filter(item -> Arrays.stream(item.innerMethod.getParameterTypes()).anyMatch(mt -> mt.isAssignableFrom(type))).findFirst().orElse(null);
     }
 
+    public String getRequestObject() { return persistentRequestClass.getSimpleName(); }
+    public String getResponseObject() { return persistentResponseClass.getSimpleName();}
+
+    public String getRequestObjectFullName() { return persistentRequestClass.getName();}
+    public String getResponseObjectFullName() { return persistentResponseClass.getName();}
+
     final Pattern patternHas = Pattern.compile("^hasOp(.*)$");
     final Pattern patternGet = Pattern.compile("^getOp(.*)$");
 
+    public String getName() {
+        return this.getClass().getSimpleName();
+    }
+
+    public String getFullName() {
+        return this.getClass().getName();
+    }
 
     public List<AxRPCDescriptionMethod> getDescription() {
         return methods.stream().map(item -> new AxRPCDescriptionMethod(
+                item.getInnerMethod().getName(),
                 item.getGetMethod().getReturnType().getName(),
+                item.getGetMethod().getReturnType().getSimpleName(),
                 item.getSetMethod().getParameterTypes()[0].getName(),
+                item.getSetMethod().getParameterTypes()[0].getSimpleName(),
                 item.loginRequired
                 )).collect(Collectors.toList());
     }

@@ -49,5 +49,6 @@ public class MyAxRPCContextService implements AxRPCContextServiceImpl<Request, M
 }
 ```
 
+Service description available on: http://localhost:8080/ax-rpc/v1/description.json
 
 Enjoy !

@@ -8,6 +8,7 @@ import java.util.List;
 public interface AxRPCDescription {
     String getName();
     String getFullName();
+    String getDescription();
 
     String getErrorCodeFieldName();
     String getCorrelationIdFieldName();
@@ -22,5 +23,5 @@ public interface AxRPCDescription {
     String getResponseObjectFullName();
 
     @JsonProperty("methods")
-    List<AxRPCDescriptionMethod> getDescription();
+    List<AxRPCDescriptionMethod> getMethods();
 }

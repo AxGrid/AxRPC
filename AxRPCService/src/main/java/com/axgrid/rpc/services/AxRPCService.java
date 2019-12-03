@@ -2,6 +2,7 @@ package com.axgrid.rpc.services;
 
 import com.axgrid.rpc.AxRPC;
 import com.axgrid.rpc.AxRPCLoginRequired;
+import com.axgrid.rpc.AxRPCServiceDescription;
 import com.axgrid.rpc.dto.AxRPCContext;
 import com.axgrid.rpc.dto.AxRPCDescription;
 import com.axgrid.rpc.dto.AxRPCDescriptionMethod;
@@ -36,15 +37,15 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
     private Class<T> persistentContextClass;
 
 
-    public static String errorCodeFieldName = "errorCode";
+    private String errorCodeFieldName = "errorCode";
 
-    public static String correlationIdFieldName = "correlationId";
+    private String correlationIdFieldName = "correlationId";
 
-    public static String successFieldName = "success";
+    private String successFieldName = "success";
 
-    public static String errorTextFieldName = "errorText";
+    private String errorTextFieldName = "errorText";
 
-    public static String sessionFieldName = "session";
+    private String sessionFieldName = "session";
 
     public String getSessionFieldName() {
         try {
@@ -110,15 +111,24 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
     final Pattern patternHas = Pattern.compile("^hasOp(.*)$");
     final Pattern patternGet = Pattern.compile("^getOp(.*)$");
 
+    private String name;
+
     public String getName() {
-        return this.getClass().getSimpleName();
+        if (this.name == null)
+            return this.getClass().getSimpleName();
+        else
+            return this.name;
     }
+
+    @Getter
+    private String description;
+
 
     public String getFullName() {
         return this.getClass().getName();
     }
 
-    public List<AxRPCDescriptionMethod> getDescription() {
+    public List<AxRPCDescriptionMethod> getMethods() {
         return methods.stream().map(item -> new AxRPCDescriptionMethod(
                 item.getInnerMethod().getName(),
                 item.getGetMethod().getReturnType().getName(),
@@ -145,7 +155,15 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
                 .map(item -> new MethodHolder(this, item.getAnnotation(AxRPC.class), item))
                 .collect(Collectors.toList());
 
-
+        AxRPCServiceDescription description = this.getClass().getAnnotation(AxRPCServiceDescription.class);
+        if (description != null) {
+            this.correlationIdFieldName = description.correlationIdFieldName();
+            this.errorCodeFieldName = description.errorCodeFieldName();
+            this.sessionFieldName = description.sessionFieldName();
+            this.errorTextFieldName = description.errorTextFieldName();
+            this.name = description.name();
+            this.description = description.description();
+        }
 
         for(Method method : persistentRequestClass.getMethods()) {
             Matcher matcher = patternGet.matcher(method.getName());

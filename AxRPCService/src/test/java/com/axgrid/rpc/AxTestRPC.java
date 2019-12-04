@@ -4,6 +4,8 @@ import com.axgrid.rpc.services.AxRPCService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Slf4j
 @Service
 public class AxTestRPC extends AxRPCService<Request, Response, AxContext> {
@@ -28,5 +30,11 @@ public class AxTestRPC extends AxRPCService<Request, Response, AxContext> {
     public RpCounter.Builder counter(OpCounter request) {
         counter += request.getIncrement();
         return RpCounter.newBuilder().setValue(counter);
+    }
+
+    @AxRPC
+    @AxRPCEmpty
+    public RpServerTime serverTime(OpServerTime time) {
+        return RpServerTime.newBuilder().setTime(new Date().getTime()).build();
     }
 }

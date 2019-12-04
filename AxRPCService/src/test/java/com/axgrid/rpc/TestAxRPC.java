@@ -28,7 +28,7 @@ public class TestAxRPC {
     @Test
     public void testIsTrue() {
         Assert.assertTrue(true);
-        Assert.assertEquals(3, rpc.methodsCount());
+        Assert.assertEquals(4, rpc.methodsCount());
         Request.Builder r = Request.newBuilder();
         r.setCorrelationId(151);
         r.setOpPing(OpPing.newBuilder()

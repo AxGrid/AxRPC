@@ -52,3 +52,11 @@ message OpCounter {
 message RpCounter {
     int32 value = 1;
 }
+
+
+message OpServerTime {
+}
+
+message RpServerTime {
+    int64 time = 1;
+}

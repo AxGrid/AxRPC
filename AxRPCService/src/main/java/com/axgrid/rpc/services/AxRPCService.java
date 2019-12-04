@@ -1,9 +1,6 @@
 package com.axgrid.rpc.services;
 
-import com.axgrid.rpc.AxRPC;
-import com.axgrid.rpc.AxRPCLoginRequired;
-import com.axgrid.rpc.AxRPCServiceDescription;
-import com.axgrid.rpc.AxRPCTrx;
+import com.axgrid.rpc.*;
 import com.axgrid.rpc.dto.AxRPCContext;
 import com.axgrid.rpc.dto.AxRPCDescription;
 import com.axgrid.rpc.dto.AxRPCDescriptionMethod;
@@ -154,7 +151,8 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
                 item.getSetMethod().getParameterTypes()[0].getName(),
                 item.getSetMethod().getParameterTypes()[0].getSimpleName(),
                 item.loginRequired,
-                item.trxRequired
+                item.trxRequired,
+                item.isEmptyRequest
                 )).collect(Collectors.toList());
     }
 
@@ -270,6 +268,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
 
         boolean loginRequired = false;
         boolean trxRequired = false;
+        boolean isEmptyRequest = false;
 
         boolean hasContext = false;
 
@@ -347,6 +346,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
             this.hasContext = Arrays.stream(innerMethod.getParameterTypes()).anyMatch(i -> i.equals(persistentContextClass));
             this.loginRequired = this.innerMethod.getAnnotation(AxRPCLoginRequired.class) != null;
             this.trxRequired = this.innerMethod.getAnnotation(AxRPCTrx.class) != null;
+            this.isEmptyRequest = this.innerMethod.getAnnotation(AxRPCEmpty.class) != null;
         }
     }
 }

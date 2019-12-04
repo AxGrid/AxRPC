@@ -39,10 +39,9 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
 
     @PostMapping(value = "/", produces = { "application/octet-stream" }, consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public void protoRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, InvocationTargetException, IllegalAccessException {
-        log.info("Incoming request");
         try {
             byte[] getBytes = IOUtils.toByteArray(request.getInputStream());
-            log.debug("Read {} bytes", getBytes.length);
+            if (log.isDebugEnabled()) log.debug("Read {} bytes", getBytes.length);
             //T requestProto = (T)parseFrom.invoke(null, request.getInputStream());
             T requestProto = (T)parseFromBytes.invoke(null, getBytes);
             C ctx = contextService.getContext(requestProto, request);

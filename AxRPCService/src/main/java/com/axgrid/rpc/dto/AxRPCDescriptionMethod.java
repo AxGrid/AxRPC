@@ -12,4 +12,5 @@ public class AxRPCDescriptionMethod {
     String responseFullName;
     String responseName;
     boolean loginRequired;
+    boolean trxRequired;
 }

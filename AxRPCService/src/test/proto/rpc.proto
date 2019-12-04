@@ -7,19 +7,24 @@ option java_multiple_files = true;
 
 message Request {
     int64 correlationId = 1;
+    string trx = 2;
     OpPing op_ping = 10;
     OpHelloWorld op_hello_world = 11;
+    OpCounter op_counter = 12;
 }
 
 
 message Response {
     int64 correlationId = 1;
-    bool success = 2;
-    string errorText = 3;
-    int32 errorCode = 4;
+    string trx = 2;
+    bool success = 3;
+
+    string errorText = 4;
+    int32 errorCode = 5;
 
     RpPing rp_ping = 10;
     RpHelloWorld rp_hello_world = 11;
+    RpCounter rp_counter = 12;
 }
 
 
@@ -37,4 +42,13 @@ message OpHelloWorld {
 
 message RpHelloWorld {
     string result = 1;
+}
+
+
+message OpCounter {
+    int32 increment = 1;
+}
+
+message RpCounter {
+    int32 value = 1;
 }

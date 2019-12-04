@@ -8,6 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootApplication
 @Slf4j
 @ActiveProfiles("test")
+@EnableAxRPC
 public class SpringTestApplication {
     public static void main(String[] args) throws Exception {
         SpringApplication.run(SpringTestApplication.class, args);

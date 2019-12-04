@@ -9,12 +9,13 @@ import java.lang.annotation.*;
 @Documented
 @Component
 public @interface AxRPCServiceDescription {
-    String name();
-    String description();
+    String name() default "";
+    String description() default "";
     String correlationIdFieldName() default "correlationId";
     String errorCodeFieldName() default "errorCode";
     String errorTextFieldName() default "errorText";
     String successFieldName() default "success";
     String sessionFieldName() default "session";
+    String trxFieldName() default "trx";
 }
 

@@ -41,7 +41,6 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
     public void protoRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, InvocationTargetException, IllegalAccessException {
         log.info("Incoming request");
         try {
-
             byte[] getBytes = IOUtils.toByteArray(request.getInputStream());
             log.debug("Read {} bytes", getBytes.length);
             //T requestProto = (T)parseFrom.invoke(null, request.getInputStream());

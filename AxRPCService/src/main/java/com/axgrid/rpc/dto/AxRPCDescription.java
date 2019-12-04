@@ -10,6 +10,7 @@ public interface AxRPCDescription {
     String getFullName();
     String getDescription();
 
+    String getTrxFieldName();
     String getErrorCodeFieldName();
     String getCorrelationIdFieldName();
     String getSuccessFieldName();

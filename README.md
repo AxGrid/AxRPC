@@ -80,3 +80,8 @@ Additional:
 
 * [AxRPCWeb](AxRPCWeb/) Web Handlers for AxRPC
 * [AxRPCNet](AxRPCNet/) TCP Handlers for AxRPC
+
+
+For me:
+
+`mvn versions:set -DnewVersion=1.4-SNAPSHOT`

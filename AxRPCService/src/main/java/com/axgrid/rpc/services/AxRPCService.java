@@ -3,15 +3,18 @@ package com.axgrid.rpc.services;
 import com.axgrid.rpc.AxRPC;
 import com.axgrid.rpc.AxRPCLoginRequired;
 import com.axgrid.rpc.AxRPCServiceDescription;
+import com.axgrid.rpc.AxRPCTrx;
 import com.axgrid.rpc.dto.AxRPCContext;
 import com.axgrid.rpc.dto.AxRPCDescription;
 import com.axgrid.rpc.dto.AxRPCDescriptionMethod;
 import com.axgrid.rpc.exception.AxRPCException;
 import com.axgrid.rpc.exception.AxRPCLoginRequiredException;
+import com.axgrid.rpc.repository.AxRPCCache;
 import com.google.protobuf.GeneratedMessageV3;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -36,6 +39,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
     private Class<T> persistentRequestClass;
     private Class<T> persistentContextClass;
 
+    private Method getTrx = null;
 
     private String errorCodeFieldName = "errorCode";
 
@@ -46,6 +50,8 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
     private String errorTextFieldName = "errorText";
 
     private String sessionFieldName = "session";
+
+    private String trxFieldName = "trx";
 
     public String getSessionFieldName() {
         try {
@@ -97,6 +103,18 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
         }
     }
 
+    public String getTrxFieldName() {
+        try {
+            if (persistentRequestClass.getMethod("get" + StringUtils.capitalize(trxFieldName)) != null) {
+                return trxFieldName;
+            } else return null;
+        }catch(NoSuchMethodException ignore) {
+            return null;
+        }
+    }
+
+    @Autowired
+    AxRPCCache<V> cacheService;
 
     private MethodHolder getRPCMethod(Class<?> type) {
         return methods.stream().filter(item -> Arrays.stream(item.innerMethod.getParameterTypes()).anyMatch(mt -> mt.isAssignableFrom(type))).findFirst().orElse(null);
@@ -123,7 +141,6 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
     @Getter
     private String description;
 
-
     public String getFullName() {
         return this.getClass().getName();
     }
@@ -135,12 +152,12 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
                 item.getGetMethod().getReturnType().getSimpleName(),
                 item.getSetMethod().getParameterTypes()[0].getName(),
                 item.getSetMethod().getParameterTypes()[0].getSimpleName(),
-                item.loginRequired
+                item.loginRequired,
+                item.trxRequired
                 )).collect(Collectors.toList());
     }
 
     public AxRPCService() {
-
         this.persistentResponseClass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[1];
 
@@ -161,8 +178,16 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
             this.errorCodeFieldName = description.errorCodeFieldName();
             this.sessionFieldName = description.sessionFieldName();
             this.errorTextFieldName = description.errorTextFieldName();
-            this.name = description.name();
+            this.successFieldName = description.successFieldName();
+            this.trxFieldName = description.trxFieldName();
+            this.name = (description.name() == null || description.name().equals("")) ? this.getClass().getSimpleName() : description.name();
             this.description = description.description();
+        }
+
+        try {
+            getTrx = this.persistentRequestClass.getMethod("get" + StringUtils.capitalize(trxFieldName));
+        }catch (NoSuchMethodException ignore) {
+
         }
 
         for(Method method : persistentRequestClass.getMethods()) {
@@ -176,7 +201,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
                         holder.getMethod = method;
                         holder.newBuilderMethod = persistentResponseClass.getMethod("newBuilder");
                         holder.setMethod = holder.newBuilderMethod.getReturnType().getMethod("setRp" + name, holder.innerMethod.getReturnType());
-                    }catch (NoSuchMethodException ignore) {}
+                    } catch (NoSuchMethodException ignore) {}
                 }
             }
         }
@@ -192,13 +217,25 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
     }
 
     public V request(T request, C context) {
+        String trx = null;
+        if (getTrx != null)
+            try {
+                trx = (String)getTrx.invoke(request);
+                V cachedResponse = cacheService.get(trx);
+
+                if (cachedResponse != null) {
+                    if (log.isDebugEnabled()) log.info("AxRPC Response from cache {} {}", trx, cachedResponse);
+                    return cachedResponse;
+                }
+            }catch (IllegalAccessException | InvocationTargetException ignore) { }
+
         for(MethodHolder holder : methods) {
             try {
                 V response = holder.Invoke(request, context);
                 if (response != null) {
-                    return response;
+                    return cacheService.put(trx, response);
                 }
-            }catch (IllegalAccessException | InvocationTargetException ignore) {
+            } catch (IllegalAccessException | InvocationTargetException ignore) {
                 return null;
             }
         }
@@ -232,6 +269,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
         final Object target;
 
         boolean loginRequired = false;
+        boolean trxRequired = false;
 
         boolean hasContext = false;
 
@@ -307,6 +345,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
             this.innerMethod = innerMethod;
             this.hasContext = Arrays.stream(innerMethod.getParameterTypes()).anyMatch(i -> i.equals(persistentContextClass));
             this.loginRequired = this.innerMethod.getAnnotation(AxRPCLoginRequired.class) != null;
+            this.trxRequired = this.innerMethod.getAnnotation(AxRPCTrx.class) != null;
         }
     }
 }

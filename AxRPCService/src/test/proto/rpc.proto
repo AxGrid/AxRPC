@@ -8,9 +8,10 @@ option java_multiple_files = true;
 message Request {
     int64 correlationId = 1;
     string trx = 2;
-    OpPing op_ping = 10;
-    OpHelloWorld op_hello_world = 11;
-    OpCounter op_counter = 12;
+    OpPing        op_ping = 10;
+    OpHelloWorld  op_hello_world = 11;
+    OpCounter     op_counter = 12;
+    OpServerTime  op_server_time = 13;
 }
 
 
@@ -22,9 +23,10 @@ message Response {
     string errorText = 4;
     int32 errorCode = 5;
 
-    RpPing rp_ping = 10;
-    RpHelloWorld rp_hello_world = 11;
-    RpCounter rp_counter = 12;
+    RpPing        rp_ping = 10;
+    RpHelloWorld  rp_hello_world = 11;
+    RpCounter     rp_counter = 12;
+    RpServerTime  rp_server_time = 13;
 }
 
 

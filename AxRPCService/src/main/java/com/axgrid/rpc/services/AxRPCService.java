@@ -9,6 +9,7 @@ import com.axgrid.rpc.dto.AxRPCDescription;
 import com.axgrid.rpc.dto.AxRPCDescriptionMethod;
 import com.axgrid.rpc.exception.AxRPCException;
 import com.axgrid.rpc.exception.AxRPCLoginRequiredException;
+import com.axgrid.rpc.exception.AxRPCTrxRequiredException;
 import com.axgrid.rpc.repository.AxRPCCache;
 import com.google.protobuf.GeneratedMessageV3;
 import lombok.Data;
@@ -187,7 +188,6 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
         try {
             getTrx = this.persistentRequestClass.getMethod("get" + StringUtils.capitalize(trxFieldName));
         }catch (NoSuchMethodException ignore) {
-
         }
 
         for(Method method : persistentRequestClass.getMethods()) {
@@ -231,7 +231,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
 
         for(MethodHolder holder : methods) {
             try {
-                V response = holder.Invoke(request, context);
+                V response = holder.Invoke(request, context, trx != null && trx.length() > 5);
                 if (response != null) {
                     return cacheService.put(trx, response);
                 }
@@ -300,8 +300,9 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
             }
         }
 
-        V Invoke(T request, C context) throws InvocationTargetException, IllegalAccessException {
+        V Invoke(T request, C context, boolean trxPresent) throws InvocationTargetException, IllegalAccessException {
             if (!(boolean)hasMethod.invoke(request)) return null;
+            if (!trxPresent && trxRequired) throw new AxRPCTrxRequiredException(this.getRPCMethodName());
             V.Builder builder = (V.Builder)newBuilderMethod.invoke(null);
             try {
                 long correlationId = getCorrelationId(request);

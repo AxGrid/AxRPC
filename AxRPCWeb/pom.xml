@@ -5,7 +5,7 @@
     <parent>
         <artifactId>AxRPC</artifactId>
         <groupId>com.axgrid.rpc</groupId>
-        <version>1.7</version>
+        <version>1.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -23,6 +23,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.axgrid.metrics</groupId>
+            <artifactId>AxMetrics</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

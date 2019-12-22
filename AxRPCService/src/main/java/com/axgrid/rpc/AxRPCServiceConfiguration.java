@@ -2,6 +2,7 @@ package com.axgrid.rpc;
 
 import com.axgrid.cache.AxCacheObject;
 import com.axgrid.cache.EnableAxCache;
+import com.axgrid.metrics.EnableAxMetrics;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableCaching
 @EnableAxCache
+@EnableAxMetrics
 public class AxRPCServiceConfiguration {
 
     public static final String RPC_CACHE ="rpc-trx";

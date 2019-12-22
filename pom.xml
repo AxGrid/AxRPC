@@ -7,7 +7,7 @@
     <groupId>com.axgrid.rpc</groupId>
     <artifactId>AxRPC</artifactId>
     <packaging>pom</packaging>
-    <version>1.7</version>
+    <version>1.8</version>
     <modules>
         <module>AxRPCService</module>
         <module>AxRPCWeb</module>
@@ -61,6 +61,11 @@
             <groupId>com.axgrid</groupId>
             <artifactId>AxCache</artifactId>
             <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.axgrid.metrics</groupId>
+            <artifactId>AxMetrics</artifactId>
+            <version>1.2</version>
         </dependency>
     </dependencies>
     </dependencyManagement>

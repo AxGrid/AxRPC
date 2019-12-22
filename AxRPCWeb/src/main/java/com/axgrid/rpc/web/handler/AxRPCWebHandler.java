@@ -1,5 +1,6 @@
 package com.axgrid.rpc.web.handler;
 
+import com.axgrid.metrics.service.AxMetricService;
 import com.axgrid.rpc.dto.AxRPCContext;
 import com.axgrid.rpc.services.AxRPCService;
 import com.axgrid.rpc.exception.AxRPCInitializeException;
@@ -9,6 +10,7 @@ import com.google.protobuf.GeneratedMessageV3;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -19,7 +21,9 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends GeneratedMessageV3, C extends AxRPCContext> {
@@ -37,8 +41,16 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
     @Autowired
     AxRPCContextService<T, C> contextService;
 
+    @Value("${axgrid.metrics.enabled:false}")
+    boolean metricsEnabled;
+
+    @Autowired
+    AxMetricService metricService;
+
     @PostMapping(value = "/", produces = { "application/octet-stream" }, consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public void protoRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, InvocationTargetException, IllegalAccessException {
+        long startDate = 0;
+        if (metricsEnabled) startDate = new Date().getTime();
         try {
             byte[] getBytes = IOUtils.toByteArray(request.getInputStream());
             if (log.isDebugEnabled()) log.debug("Read {} bytes", getBytes.length);
@@ -51,13 +63,16 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
                 if (log.isDebugEnabled()) log.debug("AxRpcResponse {} CTX:{}", responseProto, ctx);
                 if (responseProto != null){
                     responseProto.writeTo(response.getOutputStream());
+                    if (metricsEnabled) metricService.record("axrpc.request.time", new Date().getTime() - startDate, TimeUnit.MICROSECONDS);
                     return;
                 }
             }
             if (log.isDebugEnabled()) log.debug("AxRpcResponse: Not found");
+            if (metricsEnabled) metricService.increment("axrpc.error", 1, "code:404");
             throw new AxRPCNotFoundException();
 
         }catch (InvocationTargetException | IllegalAccessException e) {
+            if (metricsEnabled) metricService.increment("axrpc.error", 1, "code:500");
             log.error("InvocationError:{}", e.getMessage());
             throw e;
         }

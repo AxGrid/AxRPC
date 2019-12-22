@@ -1,5 +1,6 @@
 package com.axgrid.rpc.services;
 
+import com.axgrid.metrics.service.AxMetricService;
 import com.axgrid.rpc.*;
 import com.axgrid.rpc.dto.AxRPCContext;
 import com.axgrid.rpc.dto.AxRPCDescription;
@@ -13,12 +14,14 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,6 +63,12 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
             return null;
         }
     }
+
+    @Value("${axgrid.metrics.enabled:false}")
+    boolean metricsEnabled;
+
+    @Autowired
+    private AxMetricService metricService;
 
     public String getErrorCodeFieldName() {
         try {
@@ -215,6 +224,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
     }
 
     public V request(T request, C context) {
+        Date startDate = new Date();
         String trx = null;
         if (getTrx != null)
             try {
@@ -301,6 +311,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
 
         V Invoke(T request, C context, boolean trxPresent) throws InvocationTargetException, IllegalAccessException {
             if (!(boolean)hasMethod.invoke(request)) return null;
+            if (metricsEnabled) metricService.increment("axrpc.rpc.request", 1, "method:" + getRPCMethodName());
             if (!trxPresent && trxRequired) throw new AxRPCTrxRequiredException(this.getRPCMethodName());
             V.Builder builder = (V.Builder)newBuilderMethod.invoke(null);
             try {
@@ -312,7 +323,9 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
                 setField(builder, successFieldName, true);
                 Object result = hasContext ? innerMethod.invoke(target, res, context) : innerMethod.invoke(target, res);
                 setMethod.invoke(builder, result);
+                if (metricsEnabled) metricService.increment("axrpc.rpc.ok", 1, "method:" + getRPCMethodName());
             }catch (AxRPCException ex) {
+                if (metricsEnabled) metricService.increment("axrpc.rpc.error", 1, "method:" + getRPCMethodName()+";code:"+ex.getCode());
                 setField(builder, successFieldName, false);
                 log.error("Invoke Error in method {}.{}(): {}", target.getClass().getName(), innerMethod.getName(), ex.getMessage());
                 setField(builder, errorTextFieldName, ex.getMessage() == null ? "NULL" : ex.getMessage());
@@ -321,6 +334,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
                 setField(builder, successFieldName, false);
                 if (ex.getCause() != null) {
                     if (ex.getCause() instanceof AxRPCException) {
+                        if (metricsEnabled) { metricService.increment("axrpc.rpc.error", 1, "method:" + getRPCMethodName()+";code:"+((AxRPCException)ex.getCause()).getCode()); }
                         String message = ex.getCause().getMessage();
                         try {
                             log.info("BYTES:{}", message.getBytes("UTF-8"));
@@ -330,6 +344,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
                         setField(builder, errorTextFieldName, message);
                         setField(builder, errorCodeFieldName, ((AxRPCException)ex.getCause()).getCode());
                     }else {
+                        if (metricsEnabled) { metricService.increment("axrpc.rpc.error", 1, "method:" + getRPCMethodName()+";code:500"); }
                         log.error("Invoke Error in method " + innerMethod.getName(), ex);
                         setField(builder, errorTextFieldName, ex.getMessage() == null ? "NULL" : ex.getMessage());
                         setField(builder, errorCodeFieldName, 500);

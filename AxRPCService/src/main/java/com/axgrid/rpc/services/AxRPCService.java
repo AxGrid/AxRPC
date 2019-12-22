@@ -65,7 +65,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
     }
 
     @Value("${axgrid.metrics.enabled:false}")
-    boolean metricsEnabled;
+    public boolean metricsEnabled;
 
     @Autowired
     private AxMetricService metricService;
@@ -166,6 +166,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
     }
 
     public AxRPCService() {
+        if (metricsEnabled) log.info("AxMetric Enable");
         this.persistentResponseClass = (Class<T>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[1];
 

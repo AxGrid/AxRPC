@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -47,6 +48,14 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
     @Autowired
     AxMetricService metricService;
 
+    @PostConstruct
+    public void createCounters() {
+        metricService.initTimer("axrpc.request.time");
+        metricService.initCounter("axrpc.error", "code:404");
+        metricService.initCounter("axrpc.error", "code:500");
+        metricService.initCounter("axrpc.ok");
+    }
+
     @PostMapping(value = "/", produces = { "application/octet-stream" }, consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public void protoRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, InvocationTargetException, IllegalAccessException {
         long startDate = 0;
@@ -63,7 +72,8 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
                 if (log.isDebugEnabled()) log.debug("AxRpcResponse {} CTX:{}", responseProto, ctx);
                 if (responseProto != null){
                     responseProto.writeTo(response.getOutputStream());
-                    if (metricsEnabled) metricService.record("axrpc.request.time", new Date().getTime() - startDate, TimeUnit.MICROSECONDS);
+                    metricService.increment("axrpc.ok");
+                    if (metricsEnabled) metricService.record("axrpc.request.time", new Date().getTime() - startDate, TimeUnit.MILLISECONDS);
                     return;
                 }
             }

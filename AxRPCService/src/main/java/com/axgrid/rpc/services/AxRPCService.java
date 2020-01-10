@@ -159,6 +159,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
                 item.getGetMethod().getReturnType().getSimpleName(),
                 item.getSetMethod().getParameterTypes()[0].getName(),
                 item.getSetMethod().getParameterTypes()[0].getSimpleName(),
+                item.rpc.description(),
                 item.loginRequired,
                 item.trxRequired,
                 item.isEmptyRequest
@@ -273,6 +274,8 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
         Method getMethod;
         Method setMethod;
         Method newBuilderMethod;
+
+        String description;
 
         final Method innerMethod;
         final Object target;

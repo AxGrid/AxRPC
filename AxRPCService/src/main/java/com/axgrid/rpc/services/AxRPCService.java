@@ -67,6 +67,9 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
     @Value("${axgrid.metrics.enabled:false}")
     public boolean metricsEnabled;
 
+    @Value("${axgrid.rpc.timeout:2000}")
+    public int timeout;
+
     @Autowired
     private AxMetricService metricService;
 
@@ -162,7 +165,8 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
                 item.rpc.description(),
                 item.loginRequired,
                 item.trxRequired,
-                item.isEmptyRequest
+                item.isEmptyRequest,
+                item.timeout != 0 ? item.timeout : timeout
                 )).collect(Collectors.toList());
     }
 
@@ -283,6 +287,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
         boolean loginRequired = false;
         boolean trxRequired = false;
         boolean isEmptyRequest = false;
+        int timeout = 0;
 
         boolean hasContext = false;
 
@@ -366,6 +371,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
             this.loginRequired = this.innerMethod.getAnnotation(AxRPCLoginRequired.class) != null;
             this.trxRequired = this.innerMethod.getAnnotation(AxRPCTrx.class) != null;
             this.isEmptyRequest = this.innerMethod.getAnnotation(AxRPCEmpty.class) != null;
+            this.timeout = this.innerMethod.getAnnotation(AxRPCTimeout.class) != null ? this.innerMethod.getAnnotation(AxRPCTimeout.class).value() : 0;
         }
     }
 }

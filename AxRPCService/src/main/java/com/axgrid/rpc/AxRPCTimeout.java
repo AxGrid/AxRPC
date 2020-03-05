@@ -10,4 +10,6 @@ import java.lang.annotation.*;
 @Component
 public @interface AxRPCTimeout {
     int value() default 1000;
+    int retry() default 5;
+    int retryTimeout() default 50;
 }

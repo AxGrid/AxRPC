@@ -15,5 +15,5 @@ public class AxRPCDescriptionMethod {
     boolean loginRequired;
     boolean trxRequired;
     boolean isEmptyRequest;
-    int timeout;
+    AxRPCTimeoutHolder timeout;
 }

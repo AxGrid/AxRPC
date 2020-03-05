@@ -5,6 +5,7 @@ import com.axgrid.rpc.*;
 import com.axgrid.rpc.dto.AxRPCContext;
 import com.axgrid.rpc.dto.AxRPCDescription;
 import com.axgrid.rpc.dto.AxRPCDescriptionMethod;
+import com.axgrid.rpc.dto.AxRPCTimeoutHolder;
 import com.axgrid.rpc.exception.AxRPCException;
 import com.axgrid.rpc.exception.AxRPCLoginRequiredException;
 import com.axgrid.rpc.exception.AxRPCTrxRequiredException;
@@ -166,7 +167,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
                 item.loginRequired,
                 item.trxRequired,
                 item.isEmptyRequest,
-                item.timeout != 0 ? item.timeout : timeout
+                item.timeout == null ? new AxRPCTimeoutHolder(timeout) : item.timeout
                 )).collect(Collectors.toList());
     }
 
@@ -287,7 +288,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
         boolean loginRequired = false;
         boolean trxRequired = false;
         boolean isEmptyRequest = false;
-        int timeout = 0;
+        AxRPCTimeoutHolder timeout = null;
 
         boolean hasContext = false;
 
@@ -371,7 +372,7 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
             this.loginRequired = this.innerMethod.getAnnotation(AxRPCLoginRequired.class) != null;
             this.trxRequired = this.innerMethod.getAnnotation(AxRPCTrx.class) != null;
             this.isEmptyRequest = this.innerMethod.getAnnotation(AxRPCEmpty.class) != null;
-            this.timeout = this.innerMethod.getAnnotation(AxRPCTimeout.class) != null ? this.innerMethod.getAnnotation(AxRPCTimeout.class).value() : 0;
+            this.timeout = this.innerMethod.getAnnotation(AxRPCTimeout.class) != null ? new AxRPCTimeoutHolder(this.innerMethod.getAnnotation(AxRPCTimeout.class)) : null;
         }
     }
 }

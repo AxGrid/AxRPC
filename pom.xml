@@ -7,7 +7,7 @@
     <groupId>com.axgrid.rpc</groupId>
     <artifactId>AxRPC</artifactId>
     <packaging>pom</packaging>
-    <version>1.11</version>
+    <version>1.13</version>
     <modules>
         <module>AxRPCService</module>
         <module>AxRPCWeb</module>
@@ -123,4 +123,14 @@
         </repository>
     </distributionManagement>
 
+    <repositories>
+        <repository>
+            <id>nexus-release</id>
+            <url>http://nexus.axgrid.com/repository/maven-releases/</url>
+        </repository>
+        <repository>
+            <id>nexus-snapshot</id>
+            <url>http://nexus.axgrid.com/repository/maven-snapshots/</url>
+        </repository>
+    </repositories>
 </project>

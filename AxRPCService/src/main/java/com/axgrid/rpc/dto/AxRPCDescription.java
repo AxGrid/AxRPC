@@ -19,6 +19,7 @@ public interface AxRPCDescription {
 
     String getRequestObject();
     String getResponseObject();
+    String getHttpEntryPoint();
 
     String getRequestObjectFullName();
     String getResponseObjectFullName();

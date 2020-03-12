@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.annotation.PostConstruct;
@@ -54,6 +55,11 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
         metricService.initCounter("axrpc.error", "code:404");
         metricService.initCounter("axrpc.error", "code:500");
         metricService.initCounter("axrpc.ok");
+    }
+
+    @GetMapping(value = "/")
+    public String infoRequest() {
+        return "Only post";
     }
 
     @PostMapping(value = "/", produces = { "application/octet-stream" }, consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)

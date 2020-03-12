@@ -2,10 +2,7 @@ package com.axgrid.rpc.services;
 
 import com.axgrid.metrics.service.AxMetricService;
 import com.axgrid.rpc.*;
-import com.axgrid.rpc.dto.AxRPCContext;
-import com.axgrid.rpc.dto.AxRPCDescription;
-import com.axgrid.rpc.dto.AxRPCDescriptionMethod;
-import com.axgrid.rpc.dto.AxRPCTimeoutHolder;
+import com.axgrid.rpc.dto.*;
 import com.axgrid.rpc.exception.AxRPCException;
 import com.axgrid.rpc.exception.AxRPCLoginRequiredException;
 import com.axgrid.rpc.exception.AxRPCTrxRequiredException;
@@ -17,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.*;
@@ -40,6 +38,9 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
     private Class<T> persistentResponseClass;
     private Class<T> persistentRequestClass;
     private Class<T> persistentContextClass;
+
+    @Autowired(required = false)
+    List<AxRPCEntryPoint<T>> entryPoints;
 
     private Method getTrx = null;
 
@@ -122,6 +123,19 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
         }catch(NoSuchMethodException ignore) {
             return null;
         }
+    }
+
+    public String getHttpEntryPoint() {
+        try {
+            AxRPCEntryPoint<T> ep = entryPoints.stream().filter(item -> item.getType() == EntryPointTypes.HTTP).findFirst().orElse(null);
+            if (ep == null) return "";
+            RequestMapping rm =  ep.getClass().getAnnotation(RequestMapping.class);
+            if (rm == null || rm.value().length == 0) return "";
+            return rm.value()[0];
+        }catch (Exception e) {
+
+        }
+        return "";
     }
 
     @Autowired

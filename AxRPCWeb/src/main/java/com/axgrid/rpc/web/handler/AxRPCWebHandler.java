@@ -2,6 +2,8 @@ package com.axgrid.rpc.web.handler;
 
 import com.axgrid.metrics.service.AxMetricService;
 import com.axgrid.rpc.dto.AxRPCContext;
+import com.axgrid.rpc.dto.AxRPCEntryPoint;
+import com.axgrid.rpc.dto.EntryPointTypes;
 import com.axgrid.rpc.services.AxRPCService;
 import com.axgrid.rpc.exception.AxRPCInitializeException;
 import com.axgrid.rpc.web.exceptions.AxRPCNotFoundException;
@@ -28,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends GeneratedMessageV3, C extends AxRPCContext> {
+public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends GeneratedMessageV3, C extends AxRPCContext> implements AxRPCEntryPoint<T> {
 
     private Class<T> persistentResponseClass;
     private Class<T> persistentRequestClass;
@@ -40,6 +42,9 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
     @Autowired(required = false)
     List<AxRPCService<T, V, C>> services;
 
+    @Override
+    public EntryPointTypes getType() { return EntryPointTypes.HTTP; }
+
     @Autowired
     AxRPCContextService<T, C> contextService;
 
@@ -48,6 +53,9 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
 
     @Autowired
     AxMetricService metricService;
+
+
+
 
     @PostConstruct
     public void createCounters() {

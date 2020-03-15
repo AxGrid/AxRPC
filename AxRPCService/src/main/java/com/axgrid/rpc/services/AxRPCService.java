@@ -130,8 +130,8 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
             AxRPCEntryPoint<T> ep = entryPoints.stream().filter(item -> item.getType() == EntryPointTypes.HTTP).findFirst().orElse(null);
             if (ep == null) return "";
             RequestMapping rm =  ep.getClass().getAnnotation(RequestMapping.class);
-            if (rm == null || rm.value().length == 0) return "";
-            return rm.value()[0];
+            if (rm == null || rm.path().length == 0) return "";
+            return rm.path()[0];
         }catch (Exception e) {
 
         }

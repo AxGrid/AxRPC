@@ -2,9 +2,11 @@ package com.axgrid.rpc.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class AxRPCDescriptionMethod {
     String name;
     String requestFullName;

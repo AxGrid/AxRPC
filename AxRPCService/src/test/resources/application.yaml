@@ -2,3 +2,5 @@
 logging:
   level:
     com.axgrid: DEBUG
+server:
+  port: 0

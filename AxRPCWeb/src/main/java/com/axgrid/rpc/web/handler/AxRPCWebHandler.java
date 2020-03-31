@@ -4,6 +4,7 @@ import com.axgrid.metrics.service.AxMetricService;
 import com.axgrid.rpc.dto.AxRPCContext;
 import com.axgrid.rpc.dto.AxRPCEntryPoint;
 import com.axgrid.rpc.dto.EntryPointTypes;
+import com.axgrid.rpc.exception.AxRPCException;
 import com.axgrid.rpc.services.AxRPCService;
 import com.axgrid.rpc.exception.AxRPCInitializeException;
 import com.axgrid.rpc.web.exceptions.AxRPCNotFoundException;
@@ -80,16 +81,18 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
             //T requestProto = (T)parseFrom.invoke(null, request.getInputStream());
             T requestProto = (T)parseFromBytes.invoke(null, getBytes);
             C ctx = contextService.getContext(requestProto, request);
+
             if (log.isDebugEnabled()) log.debug("AxRpcRequest {} CTX:{}", requestProto, ctx);
             for(AxRPCService<T, V, C> service : services) {
-                V responseProto = service.request(requestProto, ctx);
-                if (log.isDebugEnabled()) log.debug("AxRpcResponse {} CTX:{}", responseProto, ctx);
-                if (responseProto != null){
-                    responseProto.writeTo(response.getOutputStream());
-                    metricService.increment("axrpc.ok");
-                    if (metricsEnabled) metricService.record("axrpc.request.time", new Date().getTime() - startDate, TimeUnit.MILLISECONDS);
-                    return;
-                }
+                    V responseProto = service.request(requestProto, ctx);
+                    if (log.isDebugEnabled()) log.debug("AxRpcResponse {} CTX:{}", responseProto, ctx);
+                    if (responseProto != null) {
+                        responseProto.writeTo(response.getOutputStream());
+                        metricService.increment("axrpc.ok");
+                        if (metricsEnabled)
+                            metricService.record("axrpc.request.time", new Date().getTime() - startDate, TimeUnit.MILLISECONDS);
+                        return;
+                    }
             }
             if (log.isDebugEnabled()) log.debug("AxRpcResponse: Not found");
             if (metricsEnabled) metricService.increment("axrpc.error", 1, "code:404");

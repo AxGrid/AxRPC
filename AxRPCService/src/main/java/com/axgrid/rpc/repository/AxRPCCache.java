@@ -28,5 +28,4 @@ public class AxRPCCache<V extends GeneratedMessageV3> {
         if (log.isDebugEnabled()) log.debug("PutOrGet into Cache:{} Trx:{} Value:{}", AxRPCServiceConfiguration.RPC_CACHE, trx, result);
         return result;
     }
-
 }

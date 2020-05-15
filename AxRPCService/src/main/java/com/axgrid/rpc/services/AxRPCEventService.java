@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class AxRPCEventService<T extends GeneratedMessageV3, C extends AxRPCContext> {
 
     @Autowired
-    AxRPCEventRepository eventRepository;
+    protected AxRPCEventRepository eventRepository;
 
     public void invoke(T message, C context) {
-
+        message.toByteArray();
     }
 
 }

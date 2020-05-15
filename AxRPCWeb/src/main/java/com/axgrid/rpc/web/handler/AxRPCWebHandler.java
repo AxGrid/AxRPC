@@ -7,6 +7,7 @@ import com.axgrid.rpc.dto.EntryPointTypes;
 import com.axgrid.rpc.exception.AxRPCException;
 import com.axgrid.rpc.services.AxRPCService;
 import com.axgrid.rpc.exception.AxRPCInitializeException;
+import com.axgrid.rpc.web.exceptions.AxRPCContextException;
 import com.axgrid.rpc.web.exceptions.AxRPCNotFoundException;
 import com.axgrid.rpc.services.AxRPCContextService;
 import com.google.protobuf.GeneratedMessageV3;
@@ -82,6 +83,7 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
             T requestProto = (T)parseFromBytes.invoke(null, getBytes);
             C ctx = contextService.getContext(requestProto, request);
 
+
             if (log.isDebugEnabled()) log.debug("AxRpcRequest {} CTX:{}", requestProto, ctx);
             for(AxRPCService<T, V, C> service : services) {
                     V responseProto = service.request(requestProto, ctx);
@@ -102,6 +104,8 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
             if (metricsEnabled) metricService.increment("axrpc.error", 1, "code:500");
             log.error("InvocationError:{}", e.getMessage());
             throw e;
+        }catch (AxRPCException e) {
+            if (e.getCode() == 403 || e.getCode() == 401) throw new AxRPCContextException();
         }
     }
 

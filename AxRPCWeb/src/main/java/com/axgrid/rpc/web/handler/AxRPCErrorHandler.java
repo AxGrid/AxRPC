@@ -43,7 +43,7 @@ public abstract class AxRPCErrorHandler<V extends GeneratedMessageV3> {
 
     public AxRPCErrorHandler() throws Exception {
         this.persistentResponseClass = (Class<V>) ((ParameterizedType) getClass()
-                .getGenericSuperclass()).getActualTypeArguments()[1];
+                .getGenericSuperclass()).getActualTypeArguments()[0];
 
         newBuilderMethod = persistentResponseClass.getMethod("newBuilder");
         V.Builder builder = (V.Builder)newBuilderMethod.invoke(null);

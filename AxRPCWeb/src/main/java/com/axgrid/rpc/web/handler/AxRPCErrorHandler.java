@@ -37,6 +37,7 @@ public abstract class AxRPCErrorHandler<V extends GeneratedMessageV3> {
         setSuccessMethod.invoke(builder, false);
         setErrorTextMethod.invoke(builder, axe.getMessage());
         setErrorCodeMethod.invoke(builder, axe.getCode());
+        builder.build().writeTo(response.getOutputStream());
     }
 
 

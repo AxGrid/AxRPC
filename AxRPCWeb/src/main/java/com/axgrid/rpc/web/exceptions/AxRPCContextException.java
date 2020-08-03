@@ -6,5 +6,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.UNAUTHORIZED) // 401
 public class AxRPCContextException extends AxRPCException {
+    public AxRPCContextException(int code, String message) {
+        super(code, message);
+    }
 
 }

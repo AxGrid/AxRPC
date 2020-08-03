@@ -18,10 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -317,9 +315,14 @@ public abstract class AxRPCService<T extends GeneratedMessageV3, V extends Gener
             return hasMethod == null || getMethod == null || setMethod == null;
         }
 
+        final Map<String, Method> setMethodMap = new ConcurrentHashMap<>();
+
         private void setField(V.Builder builder, String name, Object value) {
             try {
-                Method m = Arrays.stream(builder.getClass().getMethods()).filter(item -> item.getName().equals("set"+StringUtils.capitalize(name)) && item.getParameterTypes().length == 1).findFirst().orElse(null);
+                Method m = setMethodMap.compute(name, (k,v) -> v != null ? v :
+                        Arrays.stream(builder.getClass().getMethods()).filter(item -> item.getName().equals("set"+StringUtils.capitalize(name)) && item.getParameterTypes().length == 1).findFirst().orElse(null)
+                );
+                //Method m = Arrays.stream(builder.getClass().getMethods()).filter(item -> item.getName().equals("set"+StringUtils.capitalize(name)) && item.getParameterTypes().length == 1).findFirst().orElse(null);
                 if (m != null)
                     m.invoke(builder, value);
             } catch (InvocationTargetException | IllegalAccessException ignore) {

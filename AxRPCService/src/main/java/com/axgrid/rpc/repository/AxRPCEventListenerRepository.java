@@ -2,6 +2,7 @@ package com.axgrid.rpc.repository;
 
 import com.axgrid.rpc.AxListenerQueue;
 import com.axgrid.rpc.dto.AxRPCEventChannel;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -19,6 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Хранит ссылки от LP объектов
  */
+@Slf4j
 @Repository
 public class AxRPCEventListenerRepository implements HealthIndicator {
     final Map<AxRPCEventChannel, AxListenerQueue> listeners = new ConcurrentHashMap<>();
@@ -47,6 +49,7 @@ public class AxRPCEventListenerRepository implements HealthIndicator {
             v.add(listener);
             return v;
         });
+        if (log.isDebugEnabled()) log.debug("Add new listener {} for channel {}", listener, channel);
     }
 
     /**
@@ -56,6 +59,7 @@ public class AxRPCEventListenerRepository implements HealthIndicator {
      */
     public void removeListener(AxRPCEventChannel channel, DeferredResult<byte[]> listener) {
         if (!listeners.containsKey(channel)) return;
+        if (log.isDebugEnabled()) log.debug("Remove listener {} from channel {}", listener, channel);
         listeners.get(channel).remove(listener);
     }
 
@@ -70,6 +74,7 @@ public class AxRPCEventListenerRepository implements HealthIndicator {
         while(channelListeners.size() > 0){
             DeferredResult<byte[]> listener = channelListeners.poll();
             if (listener == null || listener.isSetOrExpired()) continue;
+            if (log.isDebugEnabled()) log.debug("  Send to {} {}bytes", listener, data.length);
             listener.setResult(data);
         }
     }

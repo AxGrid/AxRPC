@@ -1,2 +1,13 @@
 server:
   port: 0
+
+logging:
+  level:
+    com.axgrid: DEBUG
+    com.axgrid.metrics: WARN
+
+
+
+axgrid:
+  rpc:
+    eventTimeout: 2000

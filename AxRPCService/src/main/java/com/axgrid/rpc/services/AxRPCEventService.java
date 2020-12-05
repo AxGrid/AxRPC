@@ -5,6 +5,7 @@ import com.axgrid.rpc.dto.AxRPCEventDescription;
 import com.axgrid.rpc.repository.AxRPCEventListenerRepository;
 import com.axgrid.rpc.repository.AxRPCEventRepository;
 import com.google.protobuf.GeneratedMessageV3;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -17,6 +18,7 @@ import java.util.List;
  * @param <V> Сообщение
  * @param <E> Хранилище сообщений
  */
+@Slf4j
 public abstract class AxRPCEventService<V extends GeneratedMessageV3, VC extends GeneratedMessageV3, E extends AxRPCEventRepository<V>> implements AxRPCEventDescription {
 
     private Class<V> persistentEventClass;
@@ -42,12 +44,18 @@ public abstract class AxRPCEventService<V extends GeneratedMessageV3, VC extends
     public void listener(String channel, long lastId, DeferredResult<byte[]> listener) {
         //TODO: если есть хоть одно сообщеие в EventRepository сразу вернуть ответ
         List<V> oldEvents = eventRepository.getAll(channel, lastId);
-        if (oldEvents!= null) {
+        if (oldEvents!= null && oldEvents.size() > 0) {
+            if (log.isDebugEnabled()) log.debug("Found old {} event in channel {}.{}", oldEvents.size(), channel, lastId);
             listener.setResult(getResponseMessage(oldEvents).toByteArray());
             return;
         }
         //Иначе
+        if (log.isDebugEnabled()) log.debug("Add new listener for channel {}.{}", channel, lastId);
         listeners.addListener(new AxRPCEventChannel(channel), listener);
+    }
+
+    public void removeListener(String channel, DeferredResult<byte[]> listener) {
+        listeners.removeListener(new AxRPCEventChannel(channel), listener);
     }
 
     /**
@@ -56,6 +64,7 @@ public abstract class AxRPCEventService<V extends GeneratedMessageV3, VC extends
      * @param message
      */
     public void send(String channel, V message) {
+        if (log.isDebugEnabled()) log.debug("Send new event into channel channel {}: {}", channel, message);
         message = eventRepository.add(channel, message);
         //Отправим всем кто есть
         byte[] messageByte = getResponseMessage(message).toByteArray();

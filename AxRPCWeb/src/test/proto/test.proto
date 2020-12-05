@@ -24,6 +24,7 @@ message Response {
 
 message Event {
     uint64 id = 1;
+    string message = 2;
 }
 
 message EventCollection {

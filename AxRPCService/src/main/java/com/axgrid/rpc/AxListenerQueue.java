@@ -45,9 +45,7 @@ public class AxListenerQueue extends LinkedBlockingQueue<DeferredResult<byte[]>>
     @Override
     public DeferredResult<byte[]> poll() {
         totalCount.decrementAndGet();
-        DeferredResult<byte[]> res = super.poll();
-        if (res != null) totalCount.decrementAndGet();
-        return res;
+        return super.poll();
     }
 
     @Override

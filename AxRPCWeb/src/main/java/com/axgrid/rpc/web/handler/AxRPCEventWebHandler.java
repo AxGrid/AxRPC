@@ -32,7 +32,7 @@ public abstract class AxRPCEventWebHandler <V extends GeneratedMessageV3, E exte
             @RequestParam(name = "s", required = false) String session
     ) {
         C context = eventContextService.get(session);
-        if (!context.isEventAllowed()) throw new AxRPCContextException();
+        if (!context.isEventAllowed()) throw new AxRPCContextException(401, "Unauthorized");
         DeferredResult<byte[]> result = new DeferredResult<>(eventTimeout , new byte[0]);
         eventService.listener(channel, lastMessage, result);
         return result;

@@ -17,9 +17,12 @@ import java.util.List;
  * @param <V> Сообщение
  * @param <E> Хранилище сообщений
  */
-public abstract class AxRPCEventService<V extends GeneratedMessageV3, E extends AxRPCEventRepository<V>> implements AxRPCEventDescription {
+public abstract class AxRPCEventService<V extends GeneratedMessageV3, VC extends GeneratedMessageV3, E extends AxRPCEventRepository<V>> implements AxRPCEventDescription {
 
     private Class<V> persistentEventClass;
+    private Class<VC> persistentEventCollectionClass;
+
+
 
     @Autowired
     protected AxRPCEventListenerRepository listeners;
@@ -27,8 +30,8 @@ public abstract class AxRPCEventService<V extends GeneratedMessageV3, E extends 
     @Autowired
     protected E eventRepository;
 
-    protected byte[] getResponseMessage(V message) { return getResponseMessage(Collections.singletonList(message)); }
-    protected abstract byte[] getResponseMessage(List<V> message);
+    protected VC getResponseMessage(V message) { return getResponseMessage(Collections.singletonList(message)); }
+    protected abstract VC getResponseMessage(List<V> message);
 
     /**
      * Добавить листенер
@@ -40,7 +43,7 @@ public abstract class AxRPCEventService<V extends GeneratedMessageV3, E extends 
         //TODO: если есть хоть одно сообщеие в EventRepository сразу вернуть ответ
         List<V> oldEvents = eventRepository.getAll(channel, lastId);
         if (oldEvents!= null) {
-            listener.setResult(getResponseMessage(oldEvents));
+            listener.setResult(getResponseMessage(oldEvents).toByteArray());
             return;
         }
         //Иначе
@@ -55,7 +58,7 @@ public abstract class AxRPCEventService<V extends GeneratedMessageV3, E extends 
     public void send(String channel, V message) {
         message = eventRepository.add(channel, message);
         //Отправим всем кто есть
-        byte[] messageByte = getResponseMessage(message);
+        byte[] messageByte = getResponseMessage(message).toByteArray();
         listeners.sendToAll(new AxRPCEventChannel(channel), messageByte);
     }
 
@@ -66,11 +69,19 @@ public abstract class AxRPCEventService<V extends GeneratedMessageV3, E extends 
     public String getEventObjectFullName() { return persistentEventClass.getName();}
 
     @Override
+    public String getEventCollectionObject() { return persistentEventClass.getSimpleName(); }
+
+    @Override
+    public String getEventCollectionObjectFullName() { return persistentEventClass.getName();}
+
+    @Override
     public String getHttpEntryPoint() { return "/ev"; }
 
     public AxRPCEventService() {
         this.persistentEventClass = (Class<V>) ((ParameterizedType) getClass()
                 .getGenericSuperclass()).getActualTypeArguments()[0];
+        this.persistentEventCollectionClass = (Class<VC>) ((ParameterizedType) getClass()
+                .getGenericSuperclass()).getActualTypeArguments()[1];
 
     }
 

@@ -4,4 +4,8 @@ public interface AxRPCEventDescription {
     String getHttpEntryPoint();
     String getEventObject();
     String getEventObjectFullName();
+
+    String getEventCollectionObject();
+    String getEventCollectionObjectFullName();
+
 }

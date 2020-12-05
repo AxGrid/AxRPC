@@ -7,7 +7,11 @@
     <groupId>com.axgrid.rpc</groupId>
     <artifactId>AxRPC</artifactId>
     <packaging>pom</packaging>
-    <version>1.25</version>
+<<<<<<< HEAD
+    <version>1.22</version>
+=======
+    <version>1.24</version>
+>>>>>>> 7991541790b013f143ab077d662097aae6651a42
     <modules>
         <module>AxRPCService</module>
         <module>AxRPCWeb</module>

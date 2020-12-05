@@ -5,35 +5,51 @@
     <parent>
         <artifactId>AxRPC</artifactId>
         <groupId>com.axgrid.rpc</groupId>
-        <version>1.25</version>
+<<<<<<< HEAD
+        <version>1.22</version>
+=======
+        <version>1.24</version>
+>>>>>>> 7991541790b013f143ab077d662097aae6651a42
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>AxRPCWeb</artifactId>
+    <artifactId>AxRPCService</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>com.axgrid.rpc</groupId>
-            <artifactId>AxRPCService</artifactId>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+            </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.axgrid</groupId>
+            <artifactId>AxCache</artifactId>
         </dependency>
         <dependency>
             <groupId>com.axgrid.metrics</groupId>
             <artifactId>AxMetrics</artifactId>
         </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
     </dependencies>
-
 
     <build>
         <extensions>

@@ -69,10 +69,10 @@ public abstract class AxRPCEventService<V extends GeneratedMessageV3, VC extends
     public String getEventObjectFullName() { return persistentEventClass.getName();}
 
     @Override
-    public String getEventCollectionObject() { return persistentEventClass.getSimpleName(); }
+    public String getEventCollectionObject() { return persistentEventCollectionClass.getSimpleName(); }
 
     @Override
-    public String getEventCollectionObjectFullName() { return persistentEventClass.getName();}
+    public String getEventCollectionObjectFullName() { return persistentEventCollectionClass.getName();}
 
     @Override
     public String getHttpEntryPoint() { return "/ev"; }

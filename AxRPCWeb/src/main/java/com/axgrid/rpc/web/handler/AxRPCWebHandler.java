@@ -111,7 +111,8 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
             log.error("InvocationError:{}", e.getMessage());
             throw e;
         }catch (AxRPCException e) {
-            if (e.getCode() == 403 || e.getCode() == 401) throw new AxRPCContextException();
+            if (e.getCode() == 403 || e.getCode() == 401) throw new AxRPCContextException(e.getCode(), e.getMessage());
+            throw e;
         }
     }
 

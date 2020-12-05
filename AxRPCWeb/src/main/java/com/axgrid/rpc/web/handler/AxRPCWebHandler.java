@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -53,6 +55,8 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
     @Value("${axgrid.metrics.enabled:false}")
     boolean metricsEnabled;
 
+
+
     @Autowired
     AxMetricService metricService;
 
@@ -82,6 +86,8 @@ public abstract class AxRPCWebHandler<T extends GeneratedMessageV3, V extends Ge
             //T requestProto = (T)parseFrom.invoke(null, request.getInputStream());
             T requestProto = (T)parseFromBytes.invoke(null, getBytes);
             C ctx = contextService.getContext(requestProto, request);
+
+
 
 
             if (log.isDebugEnabled()) log.debug("AxRpcRequest {} CTX:{}", requestProto, ctx);

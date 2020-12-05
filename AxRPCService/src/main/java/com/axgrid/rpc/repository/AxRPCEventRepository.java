@@ -1,19 +1,14 @@
 package com.axgrid.rpc.repository;
 
-import com.axgrid.rpc.dto.AxRPCEvent;
-import org.springframework.stereotype.Repository;
+import com.google.protobuf.GeneratedMessageV3;
 
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
-@Repository
-public class AxRPCEventRepository {
-    final Map<String, Queue<AxRPCEvent>> data;
-
-    
-
-    public AxRPCEventRepository() {
-        this.data = new ConcurrentHashMap<>();
-    }
+/**
+ * Хранит команды которые нужно отправить в канал
+ * @param <V> Единичное сообщение, то что хранить будем
+ */
+public interface AxRPCEventRepository<V extends GeneratedMessageV3> {
+    List<V> getAll(String channel, Long lastId);
+    V add(String channel, V message);
 }

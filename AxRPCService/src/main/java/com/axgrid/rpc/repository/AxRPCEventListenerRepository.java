@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
@@ -32,6 +33,15 @@ public class AxRPCEventListenerRepository implements HealthIndicator {
     long axChannelAlert = 3000;
     @Value("${axgrid.rpc.listenerAlert:15000}")
     long axListenersAlert = 3000 * 5;
+
+    /**
+     * Сколько подсоеденено листенеров
+    */
+    public long getListenerCount(String channel) {
+        AxRPCEventChannel c = new AxRPCEventChannel(channel);
+        if (!listeners.containsKey(c)) return 0;
+        return listeners.get(c).size();
+    }
 
     /**
      * Добавить листенер

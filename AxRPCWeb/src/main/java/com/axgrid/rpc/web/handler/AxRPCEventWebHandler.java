@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.async.DeferredResult;
 
-public abstract class AxRPCEventWebHandler <V extends GeneratedMessageV3, E extends AxRPCEventRepository<V>, C extends AxRPCEventContext> {
+public abstract class AxRPCEventWebHandler <V extends GeneratedMessageV3, VC extends GeneratedMessageV3, E extends AxRPCEventRepository<V>, C extends AxRPCEventContext> {
 
     @Autowired
-    AxRPCEventService<V, E> eventService;
+    AxRPCEventService<V, VC, E> eventService;
 
     @Autowired
     AxRPCEventContextService<C> eventContextService;
 
-    @Value("${axgrid.rpc.eventTimeout:60_000}")
+    @Value("${axgrid.rpc.eventTimeout:60000}")
     long eventTimeout;
 
     @GetMapping(value = "/ev", produces = { "application/octet-stream" }, consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)

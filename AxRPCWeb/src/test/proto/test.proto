@@ -22,6 +22,13 @@ message Response {
     RpHelloWorld rp_hello_world = 11;
 }
 
+message Event {
+    uint64 id = 1;
+}
+
+message EventCollection {
+    repeated Event events = 1;
+}
 
 message OpPing {
     uint64 time = 1;
